@@ -1,12 +1,18 @@
-const express = require('express');
-const path = require('path');
+import express from "express";
+import path from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { _LOG } from "./utils/utils.js";
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-// Serve static files from the 'src' directory
-app.use(express.static(path.join(__dirname, 'src')));
+dotenv.config();
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port} and serving files from src/`);
-});
+const PORT = process.env.PORT;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "src")));
+
+app.listen(PORT, () => _LOG({ message: `Started server on port ${PORT}` }));
