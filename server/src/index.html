@@ -1,13 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
-</head>
-<body>
-    <h1>Hello from index.html!</h1>
-    <script src="index.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Page</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    </head>
+    <body class="p-5">
+        <h1 class="text-2xl font-bold">My Todos</1>
+        <div class="flex w-[400px] gap-2 py-2">
+            <input
+                class="flex font-normal h-9 w-full rounded-md border border-[rgb(228,228,231)] border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            />
+            <button
+                id="addTodoBtn"
+                class="cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[rgb(24,24,27)] text-white shadow hover:bg-[rgb(39,39,42)] h-9 px-4 py-2"
+            >
+                Add Todo
+            </button>
+        </div>
+        <ul id="myTodos" class="list-disc pl-5">
+            <li>
+                <button class="hover:line-through cursor-pointer text-base">Test</button>
+            </li>
+        </ul>
+        <script src="index.js"></script>
+    </body>
 </html>
-
