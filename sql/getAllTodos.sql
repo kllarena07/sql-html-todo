@@ -1,1 +1,1 @@
-SELECT * FROM todos;
+SELECT todo FROM todos;
