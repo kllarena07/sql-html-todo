@@ -3,7 +3,7 @@ import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { _LOG } from "./utils/utils.js";
+import { _log } from "./utils/utils.js";
 
 const app = express();
 
@@ -15,4 +15,4 @@ const __dirname = dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "src")));
 
-app.listen(PORT, () => _LOG({ message: `Started server on port ${PORT}` }));
+app.listen(PORT, () => _log(`Started server on port ${PORT}`));

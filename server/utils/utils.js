@@ -25,7 +25,7 @@ export async function getAllTodos(pathToDB) {
   const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
 
   if (stderr) {
-    _LOG({ message: `Error getting all todos: ${stderr}`, type: "error" });
+    _log(`Error getting all todos: ${stderr}`, "error");
     return [null, stderr];
   }
 
@@ -40,7 +40,7 @@ export async function createTodo(pathToDB, todo) {
   const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
 
   if (stderr) {
-    _LOG({ message: `Error getting all todos: ${stderr}`, type: "error" });
+    _log(`Error getting all todos: ${stderr}`, "error");
     return [null, stderr];
   }
 
