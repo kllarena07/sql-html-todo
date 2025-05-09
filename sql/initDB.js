@@ -31,7 +31,7 @@ export const execPromise = util.promisify(exec);
  *   verbose: true
  * });
  */
-export async function initDB(options = {}) {
+async function initDB(options = {}) {
   // Default options
   const {
     dbPath = "todos.db",
@@ -83,7 +83,7 @@ export async function initDB(options = {}) {
 }
 
 // Export a function to run the initialization if this module is executed directly
-export const runInit = async () => {
+const runInit = async () => {
   try {
     await initDB({ verbose: true });
     console.log("Database setup complete.");
