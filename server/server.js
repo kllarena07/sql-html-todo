@@ -3,7 +3,7 @@ import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { _log, getAllTodos, createTodo } from "./utils/utils.js";
+import { _log, getAllTodos, createTodo, deleteTodo } from "./utils/utils.js";
 
 const app = express();
 
@@ -64,6 +64,30 @@ app.post("/todos", async (req, res) => {
     return res.status(201).json({ success: true, message: "Todo created successfully" });
   } catch (err) {
     _log(`Unexpected error in POST /todos route: ${err.message}`, "error");
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const todoId = req.params.id;
+    
+    if (!todoId) {
+      _log("Attempt to delete todo without ID", "warn");
+      return res.status(400).json({ success: false, message: "Todo ID is required" });
+    }
+    
+    const [data, error] = await deleteTodo(process.env.PATH_TO_DB, todoId);
+    
+    if (error) {
+      _log(`Error deleting todo: ${error}`, "error");
+      return res.status(500).json({ success: false, message: "Failed to delete todo" });
+    }
+    
+    _log(`Deleted todo with ID: ${todoId}`, "info");
+    return res.status(200).json({ success: true, message: "Todo deleted successfully" });
+  } catch (err) {
+    _log(`Unexpected error in DELETE /todos/:id route: ${err.message}`, "error");
     res.status(500).json({ success: false, message: "Server error" });
   }
 });

@@ -96,5 +96,54 @@ async function createTodo(todoContent) {
   }
 }
 
-export { fetchTodos, createTodo };
+/**
+ * Deletes a todo on the server
+ * @param {number} todoId - The ID of the todo to delete
+ * @returns {Promise<{success: boolean, message: string, error: Error|null}>}
+ */
+async function deleteTodo(todoId) {
+  try {
+    if (!todoId) {
+      logger.warn('Cannot delete todo without ID');
+      return {
+        success: false,
+        message: 'Todo ID is required',
+        error: null
+      };
+    }
+    
+    logger.info(`Sending request to delete todo with ID: ${todoId}`);
+    
+    const response = await fetch(`/todos/${todoId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      logger.info(`Todo deleted successfully: ID ${todoId}`);
+      return {
+        success: true,
+        message: data.message || 'Todo deleted successfully',
+        error: null
+      };
+    } else {
+      logger.error(`Server error deleting todo: ${data.message}`);
+      return {
+        success: false,
+        message: data.message || 'Failed to delete todo',
+        error: null
+      };
+    }
+  } catch (error) {
+    logger.error(`Failed to delete todo with ID: ${todoId}`, error);
+    return {
+      success: false,
+      message: 'Error connecting to server',
+      error
+    };
+  }
+}
+
+export { fetchTodos, createTodo, deleteTodo };
 

@@ -1,4 +1,4 @@
-import { getAllTodos, createTodo, execPromise, _log } from "./utils.js";
+import { getAllTodos, createTodo, deleteTodo, execPromise, _log } from "./utils.js";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -103,6 +103,53 @@ async function deleteTestDB() {
         );
       }
     }
+
+    // Test deleteTodo
+    _log("Running test: deleteTodo", "info");
+    
+    // First, create a todo to delete
+    const todoToDelete = "todo item to be deleted";
+    const [createResult, createErr] = await createTodo(PATH_TO_TEST_DB, todoToDelete);
+    
+    if (createErr) {
+      throw new Error(`Failed to create test todo for deletion: ${createErr}`);
+    }
+    
+    // Get all todos to find the ID of our test todo
+    const [todosBeforeDelete, todosBeforeErr] = await getAllTodos(PATH_TO_TEST_DB);
+    
+    if (todosBeforeErr) {
+      throw new Error(`Failed to retrieve todos before delete test: ${todosBeforeErr}`);
+    }
+    
+    const todoToDeleteObj = todosBeforeDelete.find(item => item.todo === todoToDelete);
+    
+    if (!todoToDeleteObj) {
+      throw new Error(`Could not find the todo '${todoToDelete}' to delete in the database`);
+    }
+    
+    // Now delete the todo
+    const [deleteResult, deleteErr] = await deleteTodo(PATH_TO_TEST_DB, todoToDeleteObj.id);
+    
+    if (deleteErr) {
+      throw new Error(`Failed to delete todo: ${deleteErr}`);
+    }
+    
+    // Verify the todo was deleted by getting all todos again
+    const [todosAfterDelete, todosAfterErr] = await getAllTodos(PATH_TO_TEST_DB);
+    
+    if (todosAfterErr) {
+      throw new Error(`Failed to retrieve todos after delete: ${todosAfterErr}`);
+    }
+    
+    // Check that the deleted todo is no longer in the database
+    const deletedTodoStillExists = todosAfterDelete.some(item => item.id === todoToDeleteObj.id);
+    
+    if (deletedTodoStillExists) {
+      throw new Error(`Todo with ID ${todoToDeleteObj.id} was not deleted successfully`);
+    }
+    
+    _log(`Todo with ID ${todoToDeleteObj.id} deleted successfully`, "info");
 
     await deleteTestDB();
     _log("Test cleanup completed", "info");

@@ -48,40 +48,48 @@ function displayTodos(todos) {
 }
 
 /**
- * Creates a new todo element
+ * Creates a new todo element with a text button that deletes when clicked
  * @param {Todo} todo - The todo object
  * @returns {HTMLLIElement} - The created todo element
  */
 function createTodoElement(todo) {
   const newTodoLI = document.createElement('li');
-  const newTodoBtn = document.createElement('button');
+  const todoBtn = document.createElement('button');
   
-  // Store the todo ID as a data attribute for future functionality
+  // Store the todo ID as a data attribute
   newTodoLI.dataset.todoId = todo.id;
   
-  newTodoBtn.className = 'hover:line-through cursor-pointer text-base';
-  newTodoBtn.textContent = todo.todo;
+  // Configure the todo button for deletion
+  todoBtn.className = 'todo-btn cursor-pointer text-base py-1 px-2 hover:line-through transition-colors rounded';
+  todoBtn.textContent = todo.todo;
+  todoBtn.dataset.todoId = todo.id;
+  todoBtn.setAttribute('aria-label', `Delete todo: ${todo.todo}`);
+  todoBtn.title = 'Click to delete this todo';
   
-  // Add click event to toggle completion state
-  newTodoBtn.addEventListener('click', function() {
-    this.classList.toggle('line-through');
-    logger.info(`Todo marked as ${this.classList.contains('line-through') ? 'completed' : 'active'}: ${todo.todo} (ID: ${todo.id})`);
-  });
+  // No need for click event here as we'll handle it in addEventListenersToTodos
   
-  newTodoLI.appendChild(newTodoBtn);
+  newTodoLI.appendChild(todoBtn);
   return newTodoLI;
 }
 
 /**
- * Adds event listeners to all todo buttons
+ * Adds event listeners to all todo buttons for deletion
  */
 function addEventListenersToTodos() {
-  const todoButtons = document.querySelectorAll('#myTodos button');
+  const todoButtons = document.querySelectorAll('#myTodos .todo-btn');
   
   todoButtons.forEach(button => {
     button.addEventListener('click', function() {
-      this.classList.toggle('line-through');
-      logger.info(`Todo marked as ${this.classList.contains('line-through') ? 'completed' : 'active'}: ${this.textContent}`);
+      const todoId = this.dataset.todoId;
+      // The actual deletion will be handled by eventHandlers.js
+      // We're just dispatching a custom event here
+      const deleteEvent = new CustomEvent('todo:delete', { 
+        detail: { todoId }, 
+        bubbles: true 
+      });
+      this.dispatchEvent(deleteEvent);
+      
+      logger.info(`Delete requested for todo: ${this.textContent} (ID: ${todoId})`);
     });
   });
 }
@@ -94,5 +102,14 @@ function showError(message) {
   alert(message);
 }
 
-export { displayTodos, createTodoElement, addEventListenersToTodos, showError };
+/**
+ * Shows a confirmation dialog
+ * @param {string} message - Confirmation message to display
+ * @returns {boolean} - Whether the user confirmed the action
+ */
+function showConfirmation(message) {
+  return confirm(message);
+}
+
+export { displayTodos, createTodoElement, addEventListenersToTodos, showError, showConfirmation };
 

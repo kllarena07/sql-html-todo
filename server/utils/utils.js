@@ -1,7 +1,7 @@
 /**
  * @module utils
  * @description Utility functions for the Todo application, including:
- *  - Database operations for todos (create, get all)
+ *  - Database operations for todos (create, get all, delete)
  *  - Logging utilities
  *  - Promisified exec for running shell commands
  */
@@ -67,7 +67,9 @@ export async function getAllTodos(pathToDB) {
   const SQL = "SELECT id, todo FROM todos;";
 
   // Use -json flag to get JSON formatted output from sqlite3
-  const { stdout, stderr } = await execPromise(`sqlite3 -json ${pathToDB} '${SQL}'`);
+  const { stdout, stderr } = await execPromise(
+    `sqlite3 -json ${pathToDB} '${SQL}'`,
+  );
 
   if (stderr) {
     _log(`Error getting all todos: ${stderr}`, "error");
@@ -78,11 +80,11 @@ export async function getAllTodos(pathToDB) {
   try {
     // Parse the JSON output from sqlite3
     formattedData = JSON.parse(stdout);
-    
+
     // Ensure id is a number
-    formattedData = formattedData.map(item => ({
+    formattedData = formattedData.map((item) => ({
       id: Number(item.id),
-      todo: item.todo
+      todo: item.todo,
     }));
   } catch (error) {
     _log(`Error parsing todos: ${error.message}`, "error");
@@ -117,6 +119,39 @@ export async function createTodo(pathToDB, todo) {
 
   if (stderr) {
     _log(`Error creating todo: ${stderr}`, "error");
+    return [null, stderr];
+  }
+
+  const formattedData = stdout.trim().split("\n");
+
+  return [formattedData, null];
+}
+
+/**
+ * Deletes a todo from the database
+ * @async
+ * @function deleteTodo
+ * @description Removes a todo from the SQLite database by its ID
+ * @param {string} pathToDB - Path to the SQLite database file
+ * @param {number|string} todoId - The ID of the todo to delete
+ * @returns {Promise<[Array<string>|null, string|null]>} A promise that resolves with [data, error]
+ *   where data contains operation output when successful (null on error)
+ *   and error contains error message when failed (null on success)
+ * @example
+ * const [result, error] = await deleteTodo('/path/to/database.db', 1);
+ * if (error) {
+ *   console.error('Failed to delete todo:', error);
+ * } else {
+ *   console.log('Todo deleted successfully');
+ * }
+ */
+export async function deleteTodo(pathToDB, todoId) {
+  const SQL = `DELETE FROM todos WHERE id = ${todoId}`;
+
+  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} "${SQL}"`);
+
+  if (stderr) {
+    _log(`Error deleting todo: ${stderr}`, "error");
     return [null, stderr];
   }
 
