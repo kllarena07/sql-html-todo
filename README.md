@@ -44,6 +44,4 @@ cd server
 pnpm start
 ```
 
-## Final Thoughts / Notes
-
 This has been a fun little journey into the world of SQL. A lot of different things need to be added to this project, like LOTs of sanitization for security issues and rendering a message when there are no todos. If you find something interesting or have suggestions, let me know!
