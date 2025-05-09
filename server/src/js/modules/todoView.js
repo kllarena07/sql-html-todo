@@ -4,24 +4,41 @@
 import logger from './logger.js';
 
 /**
+ * Todo object structure - imported from todoService
+ * @typedef {Object} Todo
+ * @property {number} id - The unique identifier of the todo
+ * @property {string} todo - The todo text content
+ */
+
+/**
  * Displays todos in the DOM
- * @param {string} todosHTML - HTML content for the todos
+ * @param {Array<Todo>} todos - Array of todo objects to display
  * @returns {boolean} - Success status of the operation
  */
-function displayTodos(todosHTML) {
+function displayTodos(todos) {
   try {
     const todoList = document.querySelector('#myTodos');
     
     // Clear the current list
     todoList.innerHTML = '';
     
-    // Add the new todos HTML
-    todoList.innerHTML = todosHTML || '<li>No todos found</li>';
+    // Check if we have todos to display
+    if (!todos || todos.length === 0) {
+      todoList.innerHTML = '<li>No todos found</li>';
+      logger.info('No todos to display');
+      return true;
+    }
+    
+    // Create and append todo elements
+    todos.forEach(todo => {
+      const todoElement = createTodoElement(todo);
+      todoList.appendChild(todoElement);
+    });
     
     // Add event listeners to todo items
     addEventListenersToTodos();
     
-    logger.info('Successfully displayed todos in UI');
+    logger.info(`Successfully displayed ${todos.length} todos in UI`);
     return true;
   } catch (error) {
     logger.error('Failed to display todos', error);
@@ -32,20 +49,23 @@ function displayTodos(todosHTML) {
 
 /**
  * Creates a new todo element
- * @param {string} todoContent - The content of the todo
+ * @param {Todo} todo - The todo object
  * @returns {HTMLLIElement} - The created todo element
  */
-function createTodoElement(todoContent) {
+function createTodoElement(todo) {
   const newTodoLI = document.createElement('li');
   const newTodoBtn = document.createElement('button');
   
+  // Store the todo ID as a data attribute for future functionality
+  newTodoLI.dataset.todoId = todo.id;
+  
   newTodoBtn.className = 'hover:line-through cursor-pointer text-base';
-  newTodoBtn.textContent = todoContent;
+  newTodoBtn.textContent = todo.todo;
   
   // Add click event to toggle completion state
   newTodoBtn.addEventListener('click', function() {
     this.classList.toggle('line-through');
-    logger.info(`Todo marked as ${this.classList.contains('line-through') ? 'completed' : 'active'}: ${todoContent}`);
+    logger.info(`Todo marked as ${this.classList.contains('line-through') ? 'completed' : 'active'}: ${todo.todo} (ID: ${todo.id})`);
   });
   
   newTodoLI.appendChild(newTodoBtn);

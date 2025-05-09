@@ -22,22 +22,25 @@ app.get("/todos", async (req, res) => {
 
     if (error) {
       _log(`Error retrieving todos: ${error}`, "error");
-      return res.status(500).send("<p>Error loading todos</p>");
-    }
-
-    let todosHTML = "";
-    if (todos && todos.length > 0) {
-      todos.forEach((todo) => {
-        todosHTML += `<li><button class="hover:line-through cursor-pointer text-base">${todo}</button></li>`;
+      return res.status(500).json({ 
+        success: false, 
+        message: "Error loading todos", 
+        error 
       });
-    } else {
-      todosHTML = "<p>You have no todos, go ahead and make some!</p>";
     }
 
-    res.send(todosHTML);
+    _log(`Retrieved ${todos.length} todos successfully`, "info");
+    res.json({
+      success: true,
+      data: todos || []
+    });
   } catch (err) {
     _log(`Unexpected error in /todos route: ${err.message}`, "error");
-    res.status(500).send("<p>Server error</p>");
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error", 
+      error: err.message 
+    });
   }
 });
 
