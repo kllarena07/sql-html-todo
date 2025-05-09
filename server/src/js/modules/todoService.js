@@ -4,15 +4,8 @@
 import logger from './logger.js';
 
 /**
- * Todo object structure
- * @typedef {Object} Todo
- * @property {number} id - The unique identifier of the todo
- * @property {string} todo - The todo text content
- */
-
-/**
- * Fetches todos from the server
- * @returns {Promise<{success: boolean, data: Array<Todo>|null, error: Error|null}>}
+ * Fetches todos HTML from the server
+ * @returns {Promise<{success: boolean, data: string|null, error: Error|null}>}
  */
 async function fetchTodos() {
   try {
@@ -22,17 +15,12 @@ async function fetchTodos() {
       throw new Error(`Server responded with status: ${response.status}`);
     }
     
-    const responseData = await response.json();
-    
-    if (!responseData.success) {
-      throw new Error(responseData.message || 'Failed to fetch todos');
-    }
-    
-    logger.info(`Successfully fetched ${responseData.data.length} todos from server`);
+    const todosHTML = await response.text();
+    logger.info('Successfully fetched todos HTML from server');
     
     return {
       success: true,
-      data: responseData.data,
+      data: todosHTML,
       error: null
     };
   } catch (error) {

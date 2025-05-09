@@ -22,25 +22,38 @@ app.get("/todos", async (req, res) => {
 
     if (error) {
       _log(`Error retrieving todos: ${error}`, "error");
-      return res.status(500).json({ 
-        success: false, 
-        message: "Error loading todos", 
-        error 
-      });
+      return res.status(500).send("<p class='text-red-500'>Error loading todos</p>");
     }
 
-    _log(`Retrieved ${todos.length} todos successfully`, "info");
-    res.json({
-      success: true,
-      data: todos || []
-    });
+    let todosHTML = "";
+    
+    if (todos && todos.length > 0) {
+      todos.forEach(todo => {
+        // Create HTML for each todo with proper attributes and styles
+        todosHTML += `
+          <li data-todo-id="${todo.id}">
+            <button 
+              class="todo-btn cursor-pointer text-base py-1 px-2 hover:line-through transition-colors rounded"
+              data-todo-id="${todo.id}"
+              aria-label="Delete todo: ${todo.todo}"
+              title="Click to delete this todo"
+            >
+              ${todo.todo}
+            </button>
+          </li>
+        `;
+      });
+      
+      _log(`Generated HTML for ${todos.length} todos`, "info");
+    } else {
+      todosHTML = "<li>No todos found</li>";
+      _log("No todos to display", "info");
+    }
+
+    res.send(todosHTML);
   } catch (err) {
     _log(`Unexpected error in /todos route: ${err.message}`, "error");
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error", 
-      error: err.message 
-    });
+    res.status(500).send("<p class='text-red-500'>Server error</p>");
   }
 });
 

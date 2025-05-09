@@ -4,72 +4,30 @@
 import logger from './logger.js';
 
 /**
- * Todo object structure - imported from todoService
- * @typedef {Object} Todo
- * @property {number} id - The unique identifier of the todo
- * @property {string} todo - The todo text content
- */
-
-/**
- * Displays todos in the DOM
- * @param {Array<Todo>} todos - Array of todo objects to display
+ * Displays todos in the DOM using server-generated HTML
+ * @param {string} todosHTML - HTML string containing todo elements
  * @returns {boolean} - Success status of the operation
  */
-function displayTodos(todos) {
+function displayTodos(todosHTML) {
   try {
     const todoList = document.querySelector('#myTodos');
     
     // Clear the current list
     todoList.innerHTML = '';
     
-    // Check if we have todos to display
-    if (!todos || todos.length === 0) {
-      todoList.innerHTML = '<li>No todos found</li>';
-      logger.info('No todos to display');
-      return true;
-    }
-    
-    // Create and append todo elements
-    todos.forEach(todo => {
-      const todoElement = createTodoElement(todo);
-      todoList.appendChild(todoElement);
-    });
+    // Insert the HTML from the server
+    todoList.innerHTML = todosHTML || '<li>No todos found</li>';
     
     // Add event listeners to todo items
     addEventListenersToTodos();
     
-    logger.info(`Successfully displayed ${todos.length} todos in UI`);
+    logger.info('Successfully displayed todos in UI');
     return true;
   } catch (error) {
     logger.error('Failed to display todos', error);
     document.querySelector('#myTodos').innerHTML = '<li>Failed to load todos</li>';
     return false;
   }
-}
-
-/**
- * Creates a new todo element with a text button that deletes when clicked
- * @param {Todo} todo - The todo object
- * @returns {HTMLLIElement} - The created todo element
- */
-function createTodoElement(todo) {
-  const newTodoLI = document.createElement('li');
-  const todoBtn = document.createElement('button');
-  
-  // Store the todo ID as a data attribute
-  newTodoLI.dataset.todoId = todo.id;
-  
-  // Configure the todo button for deletion
-  todoBtn.className = 'todo-btn cursor-pointer text-base py-1 px-2 hover:line-through transition-colors rounded';
-  todoBtn.textContent = todo.todo;
-  todoBtn.dataset.todoId = todo.id;
-  todoBtn.setAttribute('aria-label', `Delete todo: ${todo.todo}`);
-  todoBtn.title = 'Click to delete this todo';
-  
-  // No need for click event here as we'll handle it in addEventListenersToTodos
-  
-  newTodoLI.appendChild(todoBtn);
-  return newTodoLI;
 }
 
 /**
@@ -81,6 +39,12 @@ function addEventListenersToTodos() {
   todoButtons.forEach(button => {
     button.addEventListener('click', function() {
       const todoId = this.dataset.todoId;
+      
+      if (!todoId) {
+        logger.error('Todo button clicked but no todo ID found');
+        return;
+      }
+      
       // The actual deletion will be handled by eventHandlers.js
       // We're just dispatching a custom event here
       const deleteEvent = new CustomEvent('todo:delete', { 
@@ -111,5 +75,5 @@ function showConfirmation(message) {
   return confirm(message);
 }
 
-export { displayTodos, createTodoElement, addEventListenersToTodos, showError, showConfirmation };
+export { displayTodos, addEventListenersToTodos, showError, showConfirmation };
 
