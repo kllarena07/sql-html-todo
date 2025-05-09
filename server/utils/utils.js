@@ -4,9 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const execPromise = util.promisify(exec);
-
-const PATH_TO_DB = process.env.PATH_TO_DB;
+export const execPromise = util.promisify(exec);
 
 export function _LOG({ message, type }) {
   const now = new Date().toISOString();
@@ -22,12 +20,10 @@ export function _LOG({ message, type }) {
   }
 }
 
-export async function getAllTodos() {
+export async function getAllTodos(pathToDB) {
   const SQL = "SELECT todo FROM todos;";
 
-  const { stdout, stderr } = await execPromise(
-    `sqlite3 ${PATH_TO_DB} '${SQL}'`,
-  );
+  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
 
   if (stderr) {
     _LOG({ message: `Error getting all todos: ${stderr}`, type: "error" });
@@ -39,12 +35,10 @@ export async function getAllTodos() {
   return [formattedData, null];
 }
 
-export async function createTodo(todo) {
+export async function createTodo(pathToDB, todo) {
   const SQL = `INSERT INTO todos(todo) VALUES ('${todo}')`;
 
-  const { stdout, stderr } = await execPromise(
-    `sqlite3 ${PATH_TO_DB} '${SQL}'`,
-  );
+  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
 
   if (stderr) {
     _LOG({ message: `Error getting all todos: ${stderr}`, type: "error" });
