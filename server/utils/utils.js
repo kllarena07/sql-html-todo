@@ -6,18 +6,17 @@ dotenv.config();
 
 export const execPromise = util.promisify(exec);
 
-export function _LOG({ message, type }) {
+export function _log(message, type = "log") {
   const now = new Date().toISOString();
+  const types = {
+    error: { method: console.error, label: "ERROR" },
+    warn: { method: console.warn, label: "WARN" },
+    info: { method: console.info, label: "INFO" },
+    log: { method: console.log, label: "LOG" },
+  };
 
-  switch (type) {
-    case "error":
-      console.error(`${now} [ERROR] ${message}`);
-      break;
-
-    default:
-      console.log(`${now} [LOG] ${message}`);
-      break;
-  }
+  const logType = types[type] || types.log;
+  logType.method(`${now} [${logType.label}] ${message}`);
 }
 
 export async function getAllTodos(pathToDB) {
