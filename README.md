@@ -1,6 +1,8 @@
 # A Simple SQL To-Do App
 
-This project was born out of my desire to learn SQL. I've chosen SQLite as my database of choice for its light footprint and local storage capabilities. The app uses Express.js for managing server requests and plain HTML to keep things straightforward on the frontend.
+I decided to create this project to learn some basic SQL operations. I've chosen SQLite for its light footprint and local storage capabilities, Express.js for a lightweight Javascript server framework, and plain HTML to keep things straightforward on the frontend.
+
+This has been a fun little journey into the world of SQL. A lot of different things need to be added to this project, like LOTs of sanitization for security issues and rendering a message when there are no todos. If you find something interesting or have suggestions, let me know!
 
 ## Technologies Used
 
@@ -43,5 +45,3 @@ To launch the app, simply run:
 cd server
 pnpm start
 ```
-
-This has been a fun little journey into the world of SQL. A lot of different things need to be added to this project, like LOTs of sanitization for security issues and rendering a message when there are no todos. If you find something interesting or have suggestions, let me know!
