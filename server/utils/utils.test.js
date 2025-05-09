@@ -57,7 +57,18 @@ async function deleteTestDB() {
       if (todosErr) {
         throw new Error(todosErr);
       } else {
-        _log("Todos retrieved successfully: " + JSON.stringify(todos), "info");
+        if (!Array.isArray(todos)) {
+          throw new Error("Expected todos to be an array, but got: " + typeof todos);
+        }
+        
+        if (!todos.includes("run a test script")) {
+          throw new Error("Expected todos to include 'run a test script', but got: " + JSON.stringify(todos));
+        }
+        
+        _log(
+          "Todos retrieved successfully: " + JSON.stringify(todos),
+          "info",
+        );
       }
     }
 
