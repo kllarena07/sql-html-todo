@@ -52,8 +52,8 @@ export function _log(message, type = "log") {
  * @function getAllTodos
  * @description Queries the SQLite database to retrieve all todos
  * @param {string} pathToDB - Path to the SQLite database file
- * @returns {Promise<[Array<string>|null, string|null]>} A promise that resolves with [data, error]
- *   where data is an array of todo strings when successful (null on error)
+ * @returns {Promise<[Array<{id: number, todo: string}>|null, string|null]>} A promise that resolves with [data, error]
+ *   where data is an array of todo objects when successful (null on error)
  *   and error contains error message when failed (null on success)
  * @example
  * const [todos, error] = await getAllTodos('/path/to/database.db');
@@ -64,16 +64,30 @@ export function _log(message, type = "log") {
  * }
  */
 export async function getAllTodos(pathToDB) {
-  const SQL = "SELECT todo FROM todos;";
+  const SQL = "SELECT id, todo FROM todos;";
 
-  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
+  // Use -json flag to get JSON formatted output from sqlite3
+  const { stdout, stderr } = await execPromise(`sqlite3 -json ${pathToDB} '${SQL}'`);
 
   if (stderr) {
     _log(`Error getting all todos: ${stderr}`, "error");
     return [null, stderr];
   }
 
-  const formattedData = stdout.trim().split("\n");
+  let formattedData = [];
+  try {
+    // Parse the JSON output from sqlite3
+    formattedData = JSON.parse(stdout);
+    
+    // Ensure id is a number
+    formattedData = formattedData.map(item => ({
+      id: Number(item.id),
+      todo: item.todo
+    }));
+  } catch (error) {
+    _log(`Error parsing todos: ${error.message}`, "error");
+    return [null, error.message];
+  }
 
   return [formattedData, null];
 }

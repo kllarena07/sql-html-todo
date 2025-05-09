@@ -57,12 +57,44 @@ async function deleteTestDB() {
       if (todosErr) {
         throw new Error(todosErr);
       } else {
+        // Check that todos is an array
         if (!Array.isArray(todos)) {
           throw new Error("Expected todos to be an array, but got: " + typeof todos);
         }
         
-        if (!todos.includes("run a test script")) {
-          throw new Error("Expected todos to include 'run a test script', but got: " + JSON.stringify(todos));
+        // Check that the array is not empty
+        if (todos.length === 0) {
+          throw new Error("Expected todos array to have at least one item, but it was empty");
+        }
+        
+        // Check that each todo has the correct schema
+        for (const todo of todos) {
+          // Check that todo is an object
+          if (typeof todo !== 'object' || todo === null) {
+            throw new Error(`Expected todo to be an object, but got: ${typeof todo}`);
+          }
+          
+          // Check that todo has 'id' property and it's a number
+          if (!('id' in todo)) {
+            throw new Error(`Todo object is missing 'id' property: ${JSON.stringify(todo)}`);
+          }
+          if (typeof todo.id !== 'number') {
+            throw new Error(`Expected todo.id to be a number, but got: ${typeof todo.id}`);
+          }
+          
+          // Check that todo has 'todo' property and it's a string
+          if (!('todo' in todo)) {
+            throw new Error(`Todo object is missing 'todo' property: ${JSON.stringify(todo)}`);
+          }
+          if (typeof todo.todo !== 'string') {
+            throw new Error(`Expected todo.todo to be a string, but got: ${typeof todo.todo}`);
+          }
+        }
+        
+        // Check that the todo we created exists in the array
+        const createdTodo = todos.find(item => item.todo === "run a test script");
+        if (!createdTodo) {
+          throw new Error(`Expected to find a todo with text 'run a test script', but none was found in: ${JSON.stringify(todos)}`);
         }
         
         _log(
