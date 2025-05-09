@@ -35,9 +35,9 @@ export async function getAllTodos(pathToDB) {
 }
 
 export async function createTodo(pathToDB, todo) {
-  const SQL = `INSERT INTO todos(todo) VALUES ('${todo}')`;
+  const SQL = `INSERT INTO todos(todo) VALUES ('${todo}');`;
 
-  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} '${SQL}'`);
+  const { stdout, stderr } = await execPromise(`sqlite3 ${pathToDB} "${SQL}"`);
 
   if (stderr) {
     _log(`Error getting all todos: ${stderr}`, "error");
