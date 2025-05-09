@@ -50,26 +50,27 @@ async function addTodo(todoContent) {
       return;
     }
     
-    // For now, we'll just create the todo locally
-    // Later, this should send a POST request to the server
-    const todoList = document.querySelector('#myTodos');
-    const newTodoElement = createTodoElement(todoContent);
+    logger.info(`Sending request to create todo: ${todoContent}`);
     
-    todoList.appendChild(newTodoElement);
-    logger.info(`Added new todo: ${todoContent}`);
+    const response = await fetch('/todos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ todo: todoContent })
+    });
     
-    // TODO: Implement server-side todo creation with a POST request
-    // const response = await fetch('/todos', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ todo: todoContent })
-    // });
+    const data = await response.json();
     
-    // if (response.ok) {
-    //   fetchAndDisplayTodos();
-    // }
+    if (response.ok) {
+      logger.info(`Todo created successfully: ${todoContent}`);
+      // Refresh the todo list to display the new todo
+      fetchAndDisplayTodos();
+    } else {
+      logger.error(`Server error creating todo: ${data.message}`);
+      alert(`Failed to create todo: ${data.message}`);
+    }
   } catch (error) {
     logger.error('Failed to add todo', error);
+    alert('Failed to add todo. Check console for details.');
   }
 }
 
